@@ -119,6 +119,10 @@ set cpo&vim
     let g:SuperTabLongestHighlight = 0
   endif
 
+  if !exists("g:SuperTabHighlightFirst")
+    let g:SuperTabHighlightFirst = 0
+  endif
+
   if !exists("g:SuperTabCrMapping")
     let g:SuperTabCrMapping = 1
   endif
@@ -278,6 +282,16 @@ function! s:InitBuffer()
   endif
 endfunction " }}}
 
+" s:HighlightFirst {{{
+" Highlight first item on menu open, but don't insert the item to content
+function! s:HighlightFirst()
+  if g:SuperTabHighlightFirst && !pumvisible()
+    let key = (b:complType == "\<c-p>") ? "\\<c-p>\\<c-n>\\<Up>" : "\\<c-n>\\<c-p>\\<Down>"
+    let key = "\<C-r>=pumvisible() ? \"" . key . "\" : \"\"\<CR>"
+    call feedkeys(key)
+  endif
+endfunction " }}}
+
 " s:ManualCompletionEnter() {{{
 " Handles manual entrance into completion mode.
 function! s:ManualCompletionEnter()
@@ -318,6 +332,8 @@ function! s:ManualCompletionEnter()
      \ !pumvisible()
       let dir = (complType == "\<c-x>\<c-p>") ? -1 : 1
       call feedkeys("\<c-r>=SuperTabLongestHighlight(" . dir . ")\<cr>", 'n')
+    else
+      call s:HighlightFirst()
     endif
 
     return complType
@@ -419,6 +435,8 @@ function! s:SuperTab(command)
      \ (!pumvisible() || b:complReset)
       let dir = (complType == "\<c-p>") ? -1 : 1
       call feedkeys("\<c-r>=SuperTabLongestHighlight(" . dir . ")\<cr>", 'n')
+    else
+      call s:HighlightFirst()
     endif
 
     if b:complReset
@@ -710,6 +728,7 @@ function! SuperTabCodeComplete(findstart, base) " {{{
 
   exec 'let keys = "' . escape(b:SuperTabChain[1], '<') . '"'
   call feedkeys("\<c-e>" . keys, 'nt')
+  call s:HighlightFirst()
   return []
 endfunction " }}}
 
