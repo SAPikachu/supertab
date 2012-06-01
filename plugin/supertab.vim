@@ -750,7 +750,7 @@ endfunction " }}}
   imap <script> <Plug>SuperTabForward <c-r>=<SID>SuperTab('n')<cr>
   imap <script> <Plug>SuperTabBackward <c-r>=<SID>SuperTab('p')<cr>
 
-  exec 'imap ' . g:SuperTabMappingForward . ' <Plug>SuperTabForward'
+  exec 'imap <expr> ' . g:SuperTabMappingForward . ' pumvisible() ? "\<C-y>" : "\<Plug>SuperTabForward"'
   exec 'imap ' . g:SuperTabMappingBackward . ' <Plug>SuperTabBackward'
 
   " After hitting <Tab>, hitting it once more will go to next match
